@@ -15,9 +15,29 @@ export function getSortedPostsData() {
     const fileContents = fs.readFileSync(fullPath, 'utf8');
     const matterResult = matter(fileContents);
 
+    // 如果元信息中没有 title，从内容中提取
+    let title = matterResult.data.title;
+    if (!title) {
+      // 查找第一个一级标题 (#)
+      const h1Match = matterResult.content.match(/^#\s+(.+)$/m);
+      if (h1Match) {
+        title = h1Match[1].trim();
+      } else {
+        // 查找第一个二级标题 (##)
+        const h2Match = matterResult.content.match(/^##\s+(.+)$/m);
+        if (h2Match) {
+          title = h2Match[1].trim();
+        } else {
+          // 都没有则为空
+          title = '';
+        }
+      }
+    }
+
     return {
       id,
       ...matterResult.data,
+      title, // 使用提取或原始的 title
       content: matterResult.content, // 获取内容
       date: matterResult.data.date || new Date().toISOString(), // 建议在md里写date
     };
