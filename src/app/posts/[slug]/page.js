@@ -11,9 +11,7 @@ export async function generateStaticParams() {
 }
 
 export default function Post({ params }) {
-  // 解码 URL 中的中文字符
-  const decodedSlug = decodeURIComponent(params.slug);
-  const post = getPostData(decodedSlug);
+  const post = getPostData(params.slug);
 
   return (
     <article className="prose prose-zinc dark:prose-invert max-w-none pb-24 relative">

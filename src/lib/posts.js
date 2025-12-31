@@ -51,7 +51,22 @@ export function getSortedPostsData() {
 }
 
 export function getPostData(id) {
-  const fullPath = path.join(postsDirectory, `${id}.md`);
+  // Decode the id - may be double-encoded due to how Next.js handles URL params
+  // with output: 'export' mode and Chinese filenames
+  let decodedId = id;
+  try {
+    // Try decoding once
+    decodedId = decodeURIComponent(id);
+    // If still contains encoded characters, decode again
+    if (decodedId.includes('%')) {
+      decodedId = decodeURIComponent(decodedId);
+    }
+  } catch (e) {
+    // If decoding fails, use original id
+    decodedId = id;
+  }
+
+  const fullPath = path.join(postsDirectory, `${decodedId}.md`);
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   const matterResult = matter(fileContents);
 
